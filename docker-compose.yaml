@@ -1,0 +1,80 @@
+services:
+  dys_mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "11883:1883"
+      - "19001:9001"
+    volumes:
+      - ./config/mosquitto:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    command: mosquitto -c /mosquitto/config/mosquitto.conf
+    networks:
+      - dyslexic_backend_network
+  dys_mqtt-explorer:
+    # image: imnottechie/mqtt-explorer:latest
+    image: terdia07/mqttui:v1.3.2
+    container_name: mqtt-dashboard
+    restart: unless-stopped
+    ports:
+      - "4000:80"
+      - "4001:5000"
+    environment:
+      - MQTT_BROKER=dys_mosquitto # Connect to the mosquitto service
+      - MQTT_PORT=1883 # Use internal Docker network port
+    depends_on:
+      - dys_mosquitto
+    networks:
+      - dyslexic_backend_network
+
+  dyslexic_db:
+    image: postgres:latest
+    container_name: dyslexic_postgres
+    platform: linux/amd64
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./migration/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      # - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
+      - ./config/pg_hba.conf:/var/lib/postgresql/data/18/pg_hba.conf
+    command: -p 5433
+    # ports:
+    #   - "5433:5433"
+    networks:
+      - dyslexic_backend_network
+
+  dyslexic_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # args:
+      #   HTTP_PROXY: http://host.docker.internal:10808
+      #   HTTPS_PROXY: http://host.docker.internal:10808
+      #   http_proxy: http://host.docker.internal:10808
+      #   https_proxy: http://host.docker.internal:10808
+      #   NO_PROXY: localhost,127.0.0.1
+      # extra_hosts:
+      #   - "host.docker.internal:host-gateway"
+    image: ghcr.io/niflheimdevs/dyslexics-clock
+    container_name: dyslexic_backend
+    restart: always
+    depends_on:
+      - dyslexic_db
+    env_file:
+      - ./.env
+    ports:
+      - "8081:8081"
+    networks:
+      - dyslexic_backend_network
+
+volumes:
+  pgdata:
+
+networks:
+  dyslexic_backend_network:
