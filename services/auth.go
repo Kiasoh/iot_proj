@@ -63,7 +63,7 @@ func (s *Service) GetUserProfile(id int) (*models.User, error) {
 func (s *Service) ValidateJWT(tokenString string) (*models.Claims, error) {
 	claims := &models.Claims{}
 
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		return jwtKey, nil
 	})
 

@@ -14,8 +14,8 @@ type Repository struct {
 
 func (r *Repository) CreateUser(user *models.User) error {
 	query := `
-		INSERT INTO users (email, password, key_card, access_level, last_entered)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO users (email, password, key_card, access_level)
+		VALUES ($1, $2, $3, $4)
 		RETURNING id, created_at
 	`
 	err := r.DB.QueryRow(
@@ -25,7 +25,6 @@ func (r *Repository) CreateUser(user *models.User) error {
 		user.Password,
 		user.KeyCard,
 		user.AccessLevel,
-		user.LastAccessed,
 	).Scan(&user.ID, &user.CreatedAt)
 	return err
 }

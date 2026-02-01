@@ -10,7 +10,7 @@ type User struct {
 	ID           int        `json:"id"`
 	Email        string     `json:"email"`
 	Password     string     `json:"-"`
-	KeyCard      *string `json:"key_card"`
+	KeyCard      *string    `json:"key_card"`
 	AccessLevel  int        `json:"access_level"`
 	LastAccessed *time.Time `json:"last_accessed"`
 	CreatedAt    time.Time  `json:"created_at"`
@@ -27,11 +27,11 @@ type Claims struct {
 }
 
 type EntryLog struct {
-	ID        int        `json:"id"`
-	KeyCard   *string `json:"key_card"`
-	Status    string     `json:"status"`
-	Message   *string    `json:"message"`
-	CreatedAt time.Time  `json:"created_at"`
+	ID        int       `json:"id"`
+	KeyCard   *string   `json:"key_card"`
+	Status    string    `json:"status"`
+	Message   *string   `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func StringPtr(s string) *string {

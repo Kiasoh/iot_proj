@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 
@@ -38,6 +39,7 @@ func (h *MQTTHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, err := h.Service.Login(&creds)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
