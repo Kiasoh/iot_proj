@@ -1,17 +1,3 @@
-CREATE USER niflheim WITH PASSWORD 'niflguard';
-ALTER ROLE niflheim WITH CREATEDB;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'iot_db') THEN
-        CREATE DATABASE iot_db;
-    END IF;
-END $$;
-
-\c iot_db
-
-
-
 CREATE TABLE IF NOT EXISTS "users" (
     "id" serial PRIMARY KEY,
     "email" varchar(255) UNIQUE NOT NULL,

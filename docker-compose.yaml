@@ -35,9 +35,9 @@ services:
     platform: linux/amd64
     restart: always
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_DB: iot_db
+      POSTGRES_USER: niflheim
+      POSTGRES_PASSWORD: niflguard
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql
       # - pgdata:/var/lib/postgresql/data
