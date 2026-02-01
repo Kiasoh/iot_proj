@@ -33,11 +33,6 @@ FROM alpine:3.21
 RUN apk add --no-cache 
 WORKDIR /app
 
-RUN mkdir -p ./internal/jwt
-
-COPY ./internal/jwt/private_key.pem ./internal/jwt/
-COPY ./internal/jwt/public_key.pem ./internal/jwt/
-
 COPY --from=builder /app/main .
 
 COPY .env .
