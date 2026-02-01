@@ -43,7 +43,7 @@ func ConnectSQL() *pgxpool.Pool {
 func ConnectMosquitto(handler *handlers.MQTTHandler) mqtt.Client {
 	client := mqtt.NewClient(mqtt.NewClientOptions().
 		SetClientID("backend0").
-		AddBroker(fmt.Sprintf("tcp://%s:%s", "mosquitto", "11883")).
+		AddBroker(fmt.Sprintf("tcp://%s:%s", "mosquitto", "1883")).
 		SetAutoReconnect(true).
 		SetCleanSession(true).SetOnConnectHandler(func(c mqtt.Client) {
 		log.Println("MQTT connected")
