@@ -147,6 +147,43 @@ func (r *Repository) GetEntryLogs(keyCard string) ([]*models.EntryLog, error) {
 
 	return logs, nil
 }
+func (r *Repository) GetAllEntryLogsPaginated(limit, offset int) ([]*models.EntryLog, error) {
+	rows, err := r.DB.Query(
+		context.Background(),
+		`
+			SELECT id, key_card, status, message, created_at
+			FROM entry_logs
+			ORDER BY created_at DESC
+			LIMIT $1 OFFSET $2
+		`,
+		limit,
+		offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var logs []*models.EntryLog
+	for rows.Next() {
+		log := &models.EntryLog{}
+		var message *string
+		err := rows.Scan(
+			&log.ID,
+			&log.KeyCard,
+			&log.Status,
+			&message,
+			&log.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		log.Message = message
+		logs = append(logs, log)
+	}
+
+	return logs, nil
+}
 
 func (r *Repository) GetEntryLogsPaginated(keyCard string, limit, offset int) ([]*models.EntryLog, error) {
 	rows, err := r.DB.Query(

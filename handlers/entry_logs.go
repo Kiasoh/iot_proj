@@ -36,3 +36,26 @@ func (h *MQTTHandler) GetEntryLogs(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(logs)
 }
+
+func (h *MQTTHandler) GetAllEntryLogs(w http.ResponseWriter, r *http.Request) {
+	limitStr := r.URL.Query().Get("limit")
+	offsetStr := r.URL.Query().Get("offset")
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit <= 0 {
+		limit = 10
+	}
+
+	offset, err := strconv.Atoi(offsetStr)
+	if err != nil || offset < 0 {
+		offset = 0
+	}
+
+	logs, err := h.Service.GetAllEntryLogs(limit, offset)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(logs)
+}

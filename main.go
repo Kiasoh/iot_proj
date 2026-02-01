@@ -80,6 +80,7 @@ func InitRoute(handler *handlers.MQTTHandler) http.Handler {
 			adminRouter.Use(handler.AdminMiddleware)
 			adminRouter.Post("/register", handler.Register)
 			adminRouter.Get("/users", handler.GetUsers)
+			adminRouter.Get("/all-entry-logs", handler.GetAllEntryLogs)
 			adminRouter.Put("/users/{userID}/key-card", handler.UpdateUserKeyCard)
 			adminRouter.Put("/users/{userID}/access-level", handler.UpdateUserAccessLevel)
 		})
