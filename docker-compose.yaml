@@ -39,7 +39,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
     volumes:
-      - ./migration/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql
       # - pgdata:/var/lib/postgresql/data
       - pgdata:/var/lib/postgresql
       - ./config/pg_hba.conf:/var/lib/postgresql/data/18/pg_hba.conf
