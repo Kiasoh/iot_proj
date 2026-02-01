@@ -2,11 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
 	"iot_proj/models"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func (h *MQTTHandler) UpdateUserKeyCard(w http.ResponseWriter, r *http.Request) {
@@ -95,5 +98,13 @@ func (h *MQTTHandler) Profile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *MQTTHandler) OpenGate(w http.ResponseWriter, r *http.Request) {
+	user, _ := r.Context().Value(userContextKey).(*models.User)
+	entryLog := &models.EntryLog{
+		Status:  "granted",
+		Message: models.StringPtr(fmt.Sprintf("%d admin granted access", +user.ID)),
+	}
+	if err := h.Service.Repo.CreateEntryLog(entryLog); err != nil {
+		log.Printf("Error creating entry log: %v", err)
+	}
 	h.Service.PublishLockAction("granted")
 }
