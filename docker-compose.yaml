@@ -12,7 +12,7 @@ services:
       - ./mosquitto/log:/mosquitto/log
     command: mosquitto -c /mosquitto/config/mosquitto.conf
     networks:
-      - dyslexic_backend_network
+      - iot_backend_network
   dys_mqtt-explorer:
     # image: imnottechie/mqtt-explorer:latest
     image: terdia07/mqttui:v1.3.2
@@ -27,11 +27,11 @@ services:
     depends_on:
       - dys_mosquitto
     networks:
-      - dyslexic_backend_network
+      - iot_backend_network
 
-  dyslexic_db:
+  iot_db:
     image: postgres:latest
-    container_name: dyslexic_postgres
+    container_name: iot_postgres
     platform: linux/amd64
     restart: always
     environment:
@@ -47,9 +47,9 @@ services:
     # ports:
     #   - "5433:5433"
     networks:
-      - dyslexic_backend_network
+      - iot_backend_network
 
-  dyslexic_backend:
+  iot_backend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -61,20 +61,20 @@ services:
       #   NO_PROXY: localhost,127.0.0.1
       # extra_hosts:
       #   - "host.docker.internal:host-gateway"
-    image: ghcr.io/niflheimdevs/dyslexics-clock
-    container_name: dyslexic_backend
+    image: ghcr.io/kiasoh/iot_proj
+    container_name: iot_backend
     restart: always
     depends_on:
-      - dyslexic_db
+      - iot_db
     env_file:
       - ./.env
     ports:
       - "8081:8081"
     networks:
-      - dyslexic_backend_network
+      - iot_backend_network
 
 volumes:
   pgdata:
 
 networks:
-  dyslexic_backend_network:
+  iot_backend_network:

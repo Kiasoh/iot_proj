@@ -3,8 +3,7 @@ name: Backend CD
 on:
   push:
     branches:
-      - server-backend
-      - feature/message-broker 
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,13 +14,7 @@ jobs:
       - name: Write .env file
         run: | 
             echo "${{ secrets.ENV_FILE }}" > .env
-      
-      - name: Write .pem files
-        run: |
-            mkdir ./internal/jwt
-            echo "${{ secrets.PRIVATEJWTKEY }}" > ./internal/jwt/private_key.pem
-            echo "${{ secrets.PUBLICJWTKEY }}" > ./internal/jwt/public_key.pem
-        
+          
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         
@@ -31,6 +24,7 @@ jobs:
           registry: ghcr.io
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PAT }}
+
       - name: Build and Push Docker Image
         run: |
           docker compose build
@@ -43,40 +37,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           source: "docker-compose.yaml"
-          target: "/home/ubuntu/DyslexicsClock/backend"
-
-          #FIX: has permission issues. it can't override or even delete
-      # - name: Clean and copy configs
-      #   uses: appleboy/ssh-action@v0.1.0
-      #   with:
-      #     host: ${{ secrets.SERVER_HOST }}
-      #     username: ${{ secrets.SERVER_USER }}
-      #     password: ${{ secrets.SERVER_PASSWORD }}
-      #     script: |
-      #       # Remove existing config directory
-      #       # rm -rf /home/ubuntu/DyslexicsClock/backend/config
-      #       # Create fresh directory
-      #       mkdir -p /home/ubuntu/DyslexicsClock/backend/config/mosquitto
-      # 
-      # - name: Copy configs
-      #   uses: appleboy/scp-action@v0.1.0
-      #   with:
-      #     host: ${{ secrets.SERVER_HOST }}
-      #     username: ${{ secrets.SERVER_USER }}
-      #     password: ${{ secrets.SERVER_PASSWORD }}
-      #     source: "config/*"
-      #     target: "/home/ubuntu/DyslexicsClock/backend"
-      #     overwrite: true
-      #
-      # - name: Fix permissions
-      #   uses: appleboy/ssh-action@v0.1.10
-      #   with:
-      #     host: ${{ secrets.SERVER_HOST }}
-      #     username: ${{ secrets.SERVER_USER }}
-      #     password: ${{ secrets.SERVER_PASSWORD }}
-      #     script: |
-      #       chmod 755 /home/ubuntu/DyslexicsClock/backend/config/mosquitto
-      #       chmod 644 /home/ubuntu/DyslexicsClock/backend/config/mosquitto/mosquitto.conf
+          target: "/home/ubuntu/iot_proj/backend"
 
       - name: Deploy
         uses: appleboy/ssh-action@v0.1.8
@@ -85,7 +46,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            cd /home/ubuntu/DyslexicsClock/backend
+            cd /home/ubuntu/iot_proj/backend
             echo "${{ secrets.ENV_FILE }}" > .env
             chmod 644 .env
             
