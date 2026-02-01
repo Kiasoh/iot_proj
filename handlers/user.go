@@ -93,3 +93,7 @@ func (h *MQTTHandler) Profile(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(user)
 }
+
+func (h *MQTTHandler) OpenGate(w http.ResponseWriter, r *http.Request) {
+	h.Service.PublishLockAction("granted")
+}
