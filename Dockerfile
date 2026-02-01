@@ -26,8 +26,7 @@ RUN go mod download -x
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s " -o main ./cmd
-
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s " -o main .
 FROM alpine:3.21
 
 RUN apk add --no-cache 
