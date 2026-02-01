@@ -3,19 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/go-chi/chi/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"iot_proj/handlers"
 	"iot_proj/repository"
 	"iot_proj/services"
 	"log"
 	"net/http"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func ConnectSQL() *pgxpool.Pool {
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
-		"niflheim", "niflguard", "iot_postgres", "5432", "iot_db")
+		"niflheim", "niflguard", "iot_postgres", "5433", "iot_db")
 
 	poolconfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
@@ -41,7 +43,7 @@ func ConnectSQL() *pgxpool.Pool {
 func ConnectMosquitto(handler *handlers.MQTTHandler) mqtt.Client {
 	client := mqtt.NewClient(mqtt.NewClientOptions().
 		SetClientID("backend0").
-		AddBroker(fmt.Sprintf("tcp://%s:%s", "mosquitto", "1883")).
+		AddBroker(fmt.Sprintf("tcp://%s:%s", "mosquitto", "11883")).
 		SetAutoReconnect(true).
 		SetCleanSession(true).SetOnConnectHandler(func(c mqtt.Client) {
 		log.Println("MQTT connected")
@@ -59,6 +61,13 @@ func ConnectMosquitto(handler *handlers.MQTTHandler) mqtt.Client {
 func InitRoute(handler *handlers.MQTTHandler) http.Handler {
 	mux := chi.NewRouter()
 
+	mux.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
+		ExposedHeaders: []string{"Link"},
+		MaxAge:         300,
+	}))
 	mux.Post("/login", handler.Login)
 
 	mux.Group(func(r chi.Router) {
@@ -88,7 +97,7 @@ func main() {
 	service.SetMqttClient(mb)
 
 	server := &http.Server{
-		Addr:    ":8888",
+		Addr:    ":8081",
 		Handler: InitRoute(handler),
 	}
 
